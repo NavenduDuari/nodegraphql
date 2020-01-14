@@ -24,5 +24,5 @@ app.use("/graphql", graphqlHTTP({
 }));
 
 app.listen(8000, ()=>{
-    console.log("listing to port 8000")
+    console.log("listening to port 8000")
 });

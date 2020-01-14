@@ -1,7 +1,7 @@
 const graphql = require("graphql");
 // const _ = require("lodash");
-const Book = require("../models/book");
-const Author = require("../models/author");
+const BookModel = require("../models/book");
+const AuthorModel = require("../models/author");
 
 
 
@@ -31,64 +31,64 @@ const {GraphQLObjectType,
 
 
 
-const BookType = new GraphQLObjectType({
+const BookObject = new GraphQLObjectType({
     name : "Book",
     fields : ()=>({
         id : {type : GraphQLID},
         name : {type : GraphQLString},
         genre : {type : GraphQLString},
         author : {
-            type : AuthorType,
+            type : AuthorObject,
             resolve(parent, args){
-                return(Author.findById(parent.authorId));
+                return(AuthorModel.findById(parent.authorId));
             }
         }
     })
 });
 
-const AuthorType = new GraphQLObjectType({
+const AuthorObject = new GraphQLObjectType({
     name : "Author",
     fields : ()=>({
         id : {type : GraphQLID},
         name : {type : GraphQLString},
         age : {type : GraphQLInt},
         books : {
-            type : new GraphQLList(BookType),
+            type : new GraphQLList(BookObject),
             resolve(parent, args){
-                return(Book.find({authorId : parent.id}));
+                return(BookModel.find({authorId : parent.id}));
             }
         }
     })
 });
 
-const RootQueryType = new GraphQLObjectType({
+const RootQueryObject = new GraphQLObjectType({
     name : "RootQuery",
     fields : {
        book: {
-           type : BookType,
+           type : BookObject,
            args : { id : {type : GraphQLID}},
            resolve(parent, args){
             //    code to get data from db or other sources
-                return (Book.findById(args.id));
+                return (BookModel.findById(args.id));
            }
        },
        author : {
-           type : AuthorType,
+           type : AuthorObject,
            args : { id : {type : GraphQLID}},
            resolve(parent, args){
-               return(Author.findById(args.id));
+               return(AuthorModel.findById(args.id));
            }
        },
        books : {
-           type : new GraphQLList(BookType),
+           type : new GraphQLList(BookObject),
            resolve(parent, args){
-               return(Book.find({}));
+               return(BookModel.find({}));
            }
        },
        authors : {
-           type : GraphQLList(AuthorType),
+           type : GraphQLList(AuthorObject),
            resolve(parent, args){
-               return(Author.find({}));
+               return(AuthorModel.find({}));
            }
        }
     }
@@ -98,13 +98,13 @@ const Mutation = new GraphQLObjectType({
     name : "Mutation",
     fields : {
         addAuthor : {
-            type : AuthorType,
+            type : AuthorObject,
             args : {
                 name : {type : new GraphQLNonNull(GraphQLString)},
                 age : {type : new GraphQLNonNull(GraphQLInt)}
             },
             resolve(parent, args){
-                let author = new Author({
+                let author = new AuthorModel({
                     name : args.name,
                     age : args.age
                 });
@@ -112,14 +112,14 @@ const Mutation = new GraphQLObjectType({
             }
         },
         addBook :{
-            type : BookType,
+            type : BookObject,
             args : {
                 name : {type : new GraphQLNonNull(GraphQLString)},
                 genre : {type : GraphQLString},
                 authorId : {type : new GraphQLNonNull(GraphQLID)}
             },
             resolve(parent, args){
-                let book = new Book({
+                let book = new BookModel({
                     name : args.name,
                     genre : args.genre,
                     authorId : args.authorId
@@ -132,7 +132,7 @@ const Mutation = new GraphQLObjectType({
 
 
 module.exports = new GraphQLSchema({
-    query : RootQueryType,
+    query : RootQueryObject,
     mutation : Mutation
 });
 

@@ -7,4 +7,4 @@ const authorSchema = new Schema({
     age : Number
 });
 
-module.exports = mongoose.model("Author", authorSchema);
+module.exports = mongoose.model("Author", authorSchema);// "Author" name imp?
